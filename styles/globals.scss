@@ -163,18 +163,13 @@ a.button:disabled {
   cursor: hourglass;
 }
 
-.HackerNews {
-  position: relative;
+.HackerNews .Title {
+  line-height: 1;
 }
 
-.HackerNews::after {
-  content: "Featured as Show HN";
-  position: absolute;
+.HackerNews .Featured {
   font-size: 10px;
   font-weight: 300;
-  width: 100%;
-  left: 32px;
-  margin-top: 20px;
 }
 
 input,

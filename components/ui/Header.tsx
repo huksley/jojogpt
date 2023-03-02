@@ -34,7 +34,10 @@ export const Header = () => {
               height={24}
               className="rounded bg-[#ffffff] object-contain max-h-[24px]"
             />
-            Hacker News
+            <span className="flex flex-col">
+              <span className="Title">Hacker News</span>
+              <span className="Featured">Featured as Show HN</span>
+            </span>
           </a>
           <a href="https://valosan.com?utm_source=jojogpt" target="_blank" rel="noopener noreferrer">
             Brought to you by Valosan PR Platform

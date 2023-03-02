@@ -44,7 +44,6 @@ export default function Home() {
 
   useEffect(() => {
     if (data && !isDataLoading && typeof window !== "undefined") {
-      console.info("Scrolling to top");
       window.scrollTo(0, 0);
     }
   }, [data, isDataLoading]);
