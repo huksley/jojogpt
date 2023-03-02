@@ -146,7 +146,7 @@ const UpvoteChat = ({ chatId }: { chatId?: string }) => {
           addLike({ chatId, upvote: 1 }, () => invalidate());
         })}
       >
-        Upvote&nbsp;&nbsp;⬆️&nbsp;&nbsp;{upvote?.positive}
+        ⬆️&nbsp;{upvote?.positive}
       </button>
       <button
         className="p-4"
@@ -154,7 +154,7 @@ const UpvoteChat = ({ chatId }: { chatId?: string }) => {
           addLike({ chatId, upvote: -1 }, () => invalidate());
         })}
       >
-        Downvote&nbsp;&nbsp;⬇️&nbsp;&nbsp;{upvote?.negative}
+        ⬇️&nbsp;{upvote?.negative}
       </button>
     </div>
   );
@@ -192,7 +192,7 @@ const ResultItem = ({ item, index }: { item: Result; index: number }) => {
                 addLike({ resultId: item.id, resultIndex: index, upvote: 1 }, () => invalidate());
               })}
             >
-              Upvote&nbsp;&nbsp;⬆️&nbsp;&nbsp;{upvote?.positive}
+              ⬆️&nbsp;{upvote?.positive}
             </button>
             <button
               className="p-4"
@@ -200,7 +200,7 @@ const ResultItem = ({ item, index }: { item: Result; index: number }) => {
                 addLike({ resultId: item.id, resultIndex: index, upvote: -1 }, () => invalidate());
               })}
             >
-              Downvote&nbsp;&nbsp;⬇️&nbsp;&nbsp;{upvote?.negative}
+              ⬇️&nbsp;{upvote?.negative}
             </button>
           </div>
         ) : null}
