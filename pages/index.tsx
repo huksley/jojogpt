@@ -63,6 +63,20 @@ const countries = [
   "🇿🇦 South Africa",
 ];
 
+const sortByStringWithEmojiRemoved = (a: string, b: string) => {
+  const aWithoutEmojii = removeEmoji(a);
+  const bWithoutEmojii = removeEmoji(b);
+  if (aWithoutEmojii < bWithoutEmojii) {
+    return -1;
+  }
+
+  if (aWithoutEmojii > bWithoutEmojii) {
+    return 1;
+  }
+
+  return 0;
+};
+
 export const removeEmoji = (str: string) => str.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, "").trim();
 
 const industries = [
@@ -326,7 +340,7 @@ export default function Home() {
               }}
             >
               <option>💥 SELECT 💥</option>
-              {industries.map((value) => (
+              {industries.sort(sortByStringWithEmojiRemoved).map((value) => (
                 <option key={value} value={value}>
                   {value}
                 </option>
@@ -347,7 +361,7 @@ export default function Home() {
                   }}
                 >
                   <option>💥 SELECT 💥</option>
-                  {countries.map((value) => (
+                  {countries.sort(sortByStringWithEmojiRemoved).map((value) => (
                     <option key={value} value={value}>
                       {value}
                     </option>
