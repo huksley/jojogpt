@@ -92,8 +92,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     setCookie("sessionId", sessionId, { req, res, maxAge: 60 * 60 * 24 * 365 });
   }
 
-  console.info("Session id", sessionId);
-
   try {
     if (req.method === "GET") {
       if (req.query.resultId && req.query.resultIndex) {
