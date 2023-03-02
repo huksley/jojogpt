@@ -26,7 +26,7 @@ export const Header = () => {
 
           <a
             href="https://news.ycombinator.com/item?id=34996803"
-            className="flex flex-row justify-center gap-2 font-bold"
+            className="HackerNews flex flex-row justify-center gap-2 font-bold"
           >
             <img
               src="/y.webp"
