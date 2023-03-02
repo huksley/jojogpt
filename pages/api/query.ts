@@ -39,6 +39,28 @@ const bad = {
   ],
 };
 
+/** Retry execution of specified function */
+export const retry = async <T>(fn: () => Promise<T>, attempts = 3, interval = 1000, name?: string): Promise<T> => {
+  try {
+    return await fn();
+  } catch (error) {
+    console.info("Retrying", name ?? "func", "ignoring error", error, "attempts left", attempts);
+    if (attempts > 0) {
+      return new Promise((resolve, reject) =>
+        setTimeout(
+          () =>
+            retry(fn, attempts - 1, interval)
+              .then(resolve)
+              .catch(reject),
+          interval
+        )
+      );
+    }
+
+    throw error;
+  }
+};
+
 const client = createClient({
   // ... (see https://github.com/redis/node-redis/blob/master/docs/client-configuration.md)
 });
@@ -49,7 +71,7 @@ const applyMiddleware = (middleware: any) => (request: any, response: any) =>
     middleware(request, response, (result: any) => (result instanceof Error ? reject(result) : resolve(result)));
   });
 
-const getIP = (request: any) =>
+export const getIP = (request: any) =>
   request.ip || request.headers["x-forwarded-for"] || request.headers["x-real-ip"] || request.connection.remoteAddress;
 
 export const getRateLimitMiddlewares = ({
@@ -58,15 +80,17 @@ export const getRateLimitMiddlewares = ({
   delayAfter = 10,
   delayMs = 500,
   store,
+  prefix,
 }: {
   limit?: number;
   windowMs?: number;
   delayAfter?: number;
   delayMs?: number;
   store: any;
+  prefix?: string;
 }) => [
   slowDown({
-    keyGenerator: getIP,
+    keyGenerator: prefix ? (request: any) => prefix + getIP(request) : getIP,
     windowMs,
     delayAfter,
     delayMs,
@@ -90,7 +114,7 @@ export const createMiddlewares = (opts: any) =>
     }),
   }).map(applyMiddleware);
 
-const middlewares = createMiddlewares({ limit: 10, delayAfter: 5 });
+const middlewares = createMiddlewares({ limit: 10, delayAfter: 5, prefix: "query-" });
 
 // https://dmitripavlutin.com/timeout-fetch-request/
 export const fetchWithTimeout = async (url: RequestInfo, init?: RequestInit & { timeout?: number }) => {
@@ -163,12 +187,23 @@ export default async function handler2(req: NextApiRequest, res: NextApiResponse
 
               const url = process.env.SEARCH_URL + `?${searchParams.toString()}`;
               console.info("Invoke", url);
-              const response = await fetch(url, {
-                method: "GET",
-                headers,
-              });
+              const response = await retry(() =>
+                fetchWithTimeout(url, {
+                  method: "GET",
+                  headers,
+                  timeout: 30000,
+                }).then(async (response) => {
+                  return {
+                    headers: response.headers,
+                    status: response.status,
+                    statusText: response.statusText,
+                    json: await response.json(),
+                  };
+                })
+              );
 
-              const results = await response.json();
+              console.info("Response", response);
+              const results = response.json;
               const json = (results as Result[]).map((result: any) => {
                 return {
                   id: "0",

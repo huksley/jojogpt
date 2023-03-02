@@ -147,7 +147,7 @@ const UpvoteChat = ({ chatId }: { chatId?: string }) => {
           addLike({ chatId, upvote: 1 }, () => invalidate());
         })}
       >
-        ⬆️&nbsp;{upvote?.positive}
+        👍 {upvote?.positive}
       </button>
       <button
         className="p-4"
@@ -155,7 +155,7 @@ const UpvoteChat = ({ chatId }: { chatId?: string }) => {
           addLike({ chatId, upvote: -1 }, () => invalidate());
         })}
       >
-        ⬇️&nbsp;{upvote?.negative}
+        👎 {upvote?.negative}
       </button>
     </div>
   ) : null;
@@ -193,7 +193,7 @@ const ResultItem = ({ item, index }: { item: Result; index: number }) => {
                 addLike({ resultId: item.id, resultIndex: index, upvote: 1 }, () => invalidate());
               })}
             >
-              ⬆️&nbsp;{upvote?.positive}
+              👍 {upvote?.positive}
             </button>
             <button
               className="p-4"
@@ -201,7 +201,7 @@ const ResultItem = ({ item, index }: { item: Result; index: number }) => {
                 addLike({ resultId: item.id, resultIndex: index, upvote: -1 }, () => invalidate());
               })}
             >
-              ⬇️&nbsp;{upvote?.negative}
+              👎 {upvote?.negative}
             </button>
           </div>
         ) : null}
@@ -405,7 +405,7 @@ export default function Home() {
         <h2 className="Heading2 mt-[128px]">Need more?</h2>
         <div className="bg-box my-8 flex flex-col gap-8 md:gap-4 px-6 md:px-12 py-12">
           <h3 className="SectionBigTitle">Do PR yourself</h3>
-          <div className="Desc my-6">
+          <div className="Desc mt-2 mb-4">
             Build connections with journalists to be a news source about your startup and a thought leader in your
             field. Learn more about PR in Michael Seibel&apos;s (Managing Director at YCombinator) article{" "}
             <a href="https://www.michaelseibel.com/blog/getting-press-for-your-startup">
