@@ -1,0 +1,387 @@
+/*@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500;600;800&display=swap");*/
+
+$inter-font-display: fallback;
+@import "~inter-ui/inter.scss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+* {
+  color: #e8ebe0;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+html {
+  font-family: "Inter", "Helvetica Neue", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@supports (font-variation-settings: normal) {
+  html {
+    font-family: "Inter var", "Helvetica Neue", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+html {
+  background-color: #020914;
+}
+
+html.lightx {
+  background-color: #ffffff;
+}
+
+body {
+  overflow-x: hidden;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+@media (min-width: 1140px) {
+  header,
+  .Footer,
+  main {
+    width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  html header,
+  .Footer,
+  main {
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
+  footer {
+    padding-left: 0px;
+    margin-left: 0px;
+    padding-right: 0px;
+    margin-right: 0px;
+  }
+}
+
+.Heading {
+  /* Heading */
+  font-style: normal;
+  font-weight: 800;
+  font-size: 50px;
+  line-height: 55px;
+  /* or 121% */
+  letter-spacing: -0.04em;
+  background: linear-gradient(89.97deg, #8340cc 1.84%, #e36a29 102.67%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+  .Heading {
+    font-size: 40px;
+    line-height: 45px;
+  }
+}
+
+.Heading2 {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 45px;
+  /* or 132% */
+  background: linear-gradient(103.22deg, #ae67fa -13.86%, #f49867 99.55%), #ffffff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.Desc {
+  /* Desc */
+  font-style: normal;
+  font-weight: 200;
+  font-size: 20px;
+  line-height: 27px;
+  color: #e8ebe0;
+}
+
+.Menu {
+  /* Home */
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 25px;
+  color: #e8ebe0;
+}
+
+a .Menu {
+  color: #cfae00;
+}
+
+a .Menu:hover {
+  color: #ffffff;
+}
+
+button,
+a.button {
+  display: block;
+  /* Rectangle 12 */
+  background: #e84c00;
+  border-radius: 5px;
+  /* Sign up */
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 25px;
+  /* identical to box height */
+  color: #e8ebe0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+button:hover,
+a.button:hover {
+  color: #ffffff;
+}
+
+button:disabled,
+a.button:disabled {
+  background: #e84c00;
+  color: #e8ebe0a0;
+  cursor: not-allowed;
+}
+
+input,
+select {
+  color: #cfae00;
+  background: #2d17ac;
+  border-radius: 5px;
+  border: 1px solid #2d17ac;
+  padding: 10px 15px;
+  line-height: 25px;
+  font-size: 1.8rem;
+  padding: 0.5rem 1rem;
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid #2938ff;
+  color: #ffffff;
+}
+
+input:focus::placeholder {
+  color: transparent;
+}
+
+.ButtonGroup *:first-child {
+  border-radius: 5px 0px 0px 5px;
+}
+
+.ButtonGroup *:last-child {
+  border-radius: 0px 5px 5px 0px;
+}
+
+@media (max-width: 768px) {
+  .ButtonGroup *:first-child {
+    border-radius: 5px;
+  }
+
+  .ButtonGroup *:last-child {
+    border-radius: 5px;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+.SectionBigTitle {
+  /* Section title */
+  font-style: normal;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 35px;
+  /* identical to box height, or 312% */
+  color: #e8ebe0;
+}
+
+.SectionTitle {
+  /* Section title */
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  /* identical to box height, or 312% */
+  color: #e8ebe0;
+}
+
+.SectionSubTitle {
+  /* Section title */
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 24px;
+  /* identical to box height, or 312% */
+  color: #e8ebe0;
+  position: relative;
+}
+
+footer .SectionSubTitle::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  content: attr(data-meta);
+  left: 0px;
+  height: 5px;
+  background-color: #e8ebe0;
+  background: linear-gradient(89.97deg, #e36a29 1.84%, #8340cc 102.67%);
+  margin-top: -12px;
+}
+
+hr {
+  height: 5px;
+  background-color: #e8ebe0;
+  border: 0px;
+  background: linear-gradient(89.97deg, #e36a29 1.84%, #8340cc 102.67%);
+}
+
+.bg-box .SectionTitle {
+  padding-top: 8px;
+}
+
+.bg-box .SectionTitle::before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 5px;
+  background-color: #e8ebe0;
+  background: linear-gradient(89.97deg, #e36a29 1.84%, #8340cc 102.67%);
+  margin-top: -8px;
+}
+
+.bg-box {
+  border-radius: 5px;
+}
+
+.bg-box .Desc {
+  color: #81afdd;
+}
+
+.Desc a {
+  color: #cfae00;
+}
+
+.Notice {
+  /* Notice */
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 20px;
+  color: #e8ebe0;
+}
+
+.Burn {
+  background: linear-gradient(102.97deg, #2938ff 1.84%, #e84c00 102.67%);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+}
+
+.Burn button,
+.Burn a.button {
+  background: #2d17ac;
+}
+
+footer {
+  background-color: #2d17ac;
+  margin-left: -20px;
+  padding-left: 20px;
+  margin-right: -20px;
+  padding-right: 20px;
+}
+
+.Article {
+  background-color: #2d17ac;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.VideoContainer > video {
+  object-fit: cover;
+  width: 100vw;
+  position: absolute;
+  height: 100vh;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+  filter: opacity(0.4);
+  overflow: hidden;
+}
+
+header div,
+footer div,
+main div {
+  z-index: 2;
+}
+
+.ScrollMagic {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  margin-left: -30px;
+  margin-right: -30px;
+}
+
+.ImageHolder {
+  padding: 1rem;
+  position: relative;
+  background-color: #e8ebe0;
+  background: linear-gradient(89.97deg, #8340cc 1.84%, #e36a29 102.67%);
+  padding: 12px;
+  border-radius: 5px;
+}
+
+.ImageHolder img {
+  border-radius: 5px;
+}
+
+.Hero .ImageHolder {
+  padding: 8px;
+}
+
+.bg-box .ImageHolder {
+  background-color: #e8ebe0;
+  background: white !important;
+}
+
+.markdown {
+  p,
+  ul,
+  ol {
+    margin-bottom: 1rem;
+  }
+
+  li {
+    list-style: disc;
+    margin-left: 2rem;
+  }
+
+  a {
+    color: #cfae00;
+    text-decoration: underline;
+  }
+}
