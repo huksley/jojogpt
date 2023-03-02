@@ -330,7 +330,7 @@ export default function Home() {
               talking to the press? It all starts with finding the right journalist to cover your story.
             </div>
 
-            <div className="SectionTitle">Search to find journalists 👇</div>
+            <div className="SectionTitle">Find journalists 👇</div>
 
             <h2 className="Desc my-4">I am creating a new product in the field of</h2>
 
