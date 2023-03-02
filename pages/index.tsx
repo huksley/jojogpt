@@ -138,7 +138,7 @@ const UpvoteChat = ({ chatId }: { chatId?: string }) => {
     ([url, id]: string[]) => fetch(url + "?chatId=" + id).then((r) => r.json())
   );
 
-  return (
+  return upvote ? (
     <div className="flex flex-row gap-2 justify-end">
       <button
         className="p-4"
@@ -157,7 +157,7 @@ const UpvoteChat = ({ chatId }: { chatId?: string }) => {
         ⬇️&nbsp;{upvote?.negative}
       </button>
     </div>
-  );
+  ) : null;
 };
 
 const ResultItem = ({ item, index }: { item: Result; index: number }) => {
@@ -184,7 +184,7 @@ const ResultItem = ({ item, index }: { item: Result; index: number }) => {
           Go →
         </a>
 
-        {item.id && item.id !== "0" ? (
+        {item.id && item.id !== "0" && upvote ? (
           <div className="flex flex-row justify-end gap-2">
             <button
               className="p-4"
@@ -234,7 +234,9 @@ export default function Home() {
     }
   );
 
-  const { data: limit } = useSWR("/api/tokens", (url: string) => fetch(url).then((r) => r.json()));
+  const { data: limit } = useSWR("/api/tokens", (url: string) => fetch(url).then((r) => r.json()), {
+    refreshInterval: 10000,
+  });
 
   return (
     <>
