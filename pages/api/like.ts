@@ -58,7 +58,7 @@ const addLikeResult = async (resultId: string, resultIndex: number, upvote: numb
 };
 
 const middlewaresGet = createMiddlewares({ limit: 100, delayAfter: 100 });
-const middlewaresPost = createMiddlewares({ limit: 10, delayAfter: 15 });
+const middlewaresPost = createMiddlewares({ limit: 20, delayAfter: 20 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Resp | { message?: string }>) {
   try {

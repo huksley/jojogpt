@@ -93,24 +93,24 @@ const industries = [
   "🎮 Gaming",
   "🎥 Media",
   "🎨 Design",
-  "🎨 Fashion",
-  "🎨 Beauty",
-  "🎨 Food",
-  "🎨 Travel",
-  "🎨 Lifestyle",
-  "🎨 Entertainment",
-  "🎨 Music",
-  "🎨 Events",
-  "🎨 Culture",
-  "🎨 Religion",
-  "🎨 Politics",
-  "🎨 Science",
-  "🎨 Environment",
-  "🎨 Energy",
-  "🎨 Transportation",
-  "🎨 Construction",
-  "🎨 Agriculture",
-  "🎨 Mining",
+  "🥻 Fashion",
+  "🌹 Beauty",
+  "🍜 Food",
+  "✈️ Travel",
+  "🪩 Lifestyle",
+  "🎭 Entertainment",
+  "🎷 Music",
+  "📅 Events",
+  "🎼 Culture",
+  "🙏 Religion",
+  "🏢 Politics",
+  "🔬 Science",
+  "🌏 Environment",
+  "⚡ Energy",
+  "🚌 Transportation",
+  "🏗️ Construction",
+  "🌾 Agriculture",
+  "⛏️ Mining",
 ];
 
 const addLike = (data: any, callback: () => void) => {
@@ -284,7 +284,9 @@ export default function Home() {
               {removeEmoji(country)}
             </h1>
 
-            <h2 className="SectionTitle mt-8 mb-4">JojoGPT recommends these {data?.links.length} resources:</h2>
+            <h2 className="SectionTitle mt-8 mb-4">
+              JojoGPT recommends to read these {data?.links.length} web results:
+            </h2>
 
             <div className="my-4 flex flex-col gap-4">
               {data.links.map((item, index) => (
@@ -403,8 +405,8 @@ export default function Home() {
         <div className="bg-box my-8 flex flex-col gap-8 md:gap-4 px-6 md:px-12 py-12">
           <h3 className="SectionBigTitle">Do PR yourself</h3>
           <div className="Desc my-6">
-            You should build your own connection with journalist to be a good source and thought leader in your field.
-            Learn more about PR in Michael Seibel&apos;s (Managing Director at YCombinator) article{" "}
+            Build connections with journalists to be a news source about your startup and a thought leader in your
+            field. Learn more about PR in Michael Seibel&apos;s (Managing Director at YCombinator) article{" "}
             <a href="https://www.michaelseibel.com/blog/getting-press-for-your-startup">
               &quot;Getting press for your startup&quot;
             </a>
@@ -426,7 +428,7 @@ export default function Home() {
 
             <div className="flex flex-col gap-2">
               <h3 className="SectionTitle">Build connections</h3>
-              <div className="Desc">Follow the journalists, connect and pitch your idea.</div>
+              <div className="Desc">Follow the journalists, e-mail to them and pitch your idea.</div>
             </div>
 
             <div className="flex flex-col gap-2">
