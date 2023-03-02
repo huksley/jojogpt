@@ -160,7 +160,7 @@ button:disabled,
 a.button:disabled {
   background: #e84c00;
   color: #e8ebe0a0;
-  cursor: not-allowed;
+  cursor: hourglass;
 }
 
 input,
@@ -383,5 +383,32 @@ main div {
   a {
     color: #cfae00;
     text-decoration: underline;
+  }
+}
+
+.fly {
+  animation-name: fly-animation;
+  animation-duration: 2.5s;
+  animation-iteration-count: infinite;
+  transform-origin: 50% 50%;
+  display: inline-block;
+  transform: rotate(-45deg);
+}
+
+@keyframes fly-animation {
+  0% {
+    transform: translateX(0px) rotate(-45deg);
+  }
+  25% {
+    transform: translateX(-3px) rotate(-45deg);
+  }
+  50% {
+    transform: translateX(0px) rotate(-45deg);
+  }
+  75% {
+    transform: translateX(+3px) rotate(-45deg);
+  }
+  100% {
+    transform: translateX(0px) rotate(-45deg);
   }
 }

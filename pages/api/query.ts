@@ -7,7 +7,7 @@ import { createClient } from "redis";
 import consoleStamp from "console-stamp";
 import { hash, queryChatGpt } from "../../components/test";
 import { getCache } from "@/components/cache";
-import { removeEmoji } from "..";
+import { removeEmoji } from "@/components/emoji";
 import { saveChat, saveResults } from "../../components/like_pg";
 consoleStamp(console);
 

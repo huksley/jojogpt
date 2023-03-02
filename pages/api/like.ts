@@ -1,13 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import consoleStamp from "console-stamp";
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import { getCache } from "@/components/cache";
-import { Limit, timestampDay } from "../../components/limit";
-import { createHash } from "crypto";
-import { createClient } from "@supabase/supabase-js";
-import { createMiddlewares, Result, runLimiterMiddleware } from "./query";
-import { getCookies, getCookie, setCookie, deleteCookie } from "cookies-next";
+import { createMiddlewares, runLimiterMiddleware } from "./query";
+import { getCookie, setCookie } from "cookies-next";
 import { hash } from "@/components/test";
 
 consoleStamp(console);

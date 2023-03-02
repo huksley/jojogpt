@@ -1,215 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { useState } from "react";
 import useSWR from "swr";
-import { Data, Result } from "./api/query";
+import { Data } from "./api/query";
 import { useQueryState } from "next-usequerystate";
 import { trackLink, trackOnClick, track } from "../components/trackLink";
-import { compiler, MarkdownToJSX } from "markdown-to-jsx";
-import Link from "next/link";
-
-const DivElement = ({ children, ...props }: { children: React.ReactNode; props: unknown }) =>
-  React.createElement("div", { ...props, className: "markdown" }, children);
-
-export const formatMarkdown = (
-  str: string | string[] | undefined,
-  options?: MarkdownToJSX.Options,
-  overrides?: MarkdownToJSX.Overrides,
-  forceBlock?: boolean
-) => {
-  if (str === undefined) {
-    return null;
-  }
-  return compiler(Array.isArray(str) ? str.join() : typeof str === "string" ? str : String(str), {
-    wrapper: DivElement,
-    overrides: {
-      ...overrides,
-    },
-    disableParsingRawHTML: true,
-    ...options,
-  });
-};
-
-const countries = [
-  "🇦🇺 Australia",
-  "🇦🇹 Austria",
-  "🇧🇪 Belgium",
-  "🇧🇷 Brazil",
-  "🇨🇦 Canada",
-  "🇨🇭 Switzerland",
-  "🇨🇿 Czech Republic",
-  "🇩🇪 Germany",
-  "🇪🇸 Spain",
-  "🇫🇮 Finland",
-  "🇫🇷 France",
-  "🇬🇧 UK",
-  "🇭🇺 Hungary",
-  "🇮🇪 Ireland",
-  "🇮🇹 Italy",
-  "🇯🇵 Japan",
-  "🇱🇹 Lithuania",
-  "🇳🇱 Netherlands",
-  "🇳🇴 Norway",
-  "🇵🇱 Poland",
-  "🇵🇹 Portugal",
-  "🇷🇺 Russia",
-  "🇸🇪 Sweden",
-  "🇹🇷 Turkey",
-  "🇺🇸 USA",
-  "🇺🇦 Ukraine",
-  "🇺🇿 Uzbekistan",
-  "🇻🇳 Vietnam",
-  "🇿🇦 South Africa",
-];
-
-const sortByStringWithEmojiRemoved = (a: string, b: string) => {
-  const aWithoutEmojii = removeEmoji(a);
-  const bWithoutEmojii = removeEmoji(b);
-  if (aWithoutEmojii < bWithoutEmojii) {
-    return -1;
-  }
-
-  if (aWithoutEmojii > bWithoutEmojii) {
-    return 1;
-  }
-
-  return 0;
-};
-
-export const removeEmoji = (str: string) => str.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, "").trim();
-
-const industries = [
-  "🚀 Tech",
-  "🏦 Finance",
-  "🏥 Healthcare",
-  "🏭 Manufacturing",
-  "🏢 Business",
-  "🏫 Education",
-  "🏡 Real Estate",
-  "🏛️ Government",
-  "🏆 Sports",
-  "🎨 Arts",
-  "🎮 Gaming",
-  "🎥 Media",
-  "🎨 Design",
-  "🥻 Fashion",
-  "🌹 Beauty",
-  "🍜 Food",
-  "✈️ Travel",
-  "🪩 Lifestyle",
-  "🎭 Entertainment",
-  "🎷 Music",
-  "📅 Events",
-  "🎼 Culture",
-  "🙏 Religion",
-  "🏢 Politics",
-  "🔬 Science",
-  "🌏 Environment",
-  "⚡ Energy",
-  "🚌 Transportation",
-  "🏗️ Construction",
-  "🌾 Agriculture",
-  "⛏️ Mining",
-];
-
-const addLike = (data: any, callback: () => void) => {
-  console.info("Submitting", data);
-  return fetch("/api/like", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-    .then((r) => r.json())
-    .then((r) => {
-      console.log(r);
-      callback();
-    })
-    .catch((e) => {
-      console.warn("Rate limited", e);
-    });
-};
-
-const UpvoteChat = ({ chatId }: { chatId?: string }) => {
-  const { data: upvote, mutate: invalidate } = useSWR<{ negative: 0; positive: 0 }>(
-    chatId && chatId != "0" ? ["/api/like", chatId] : null,
-    ([url, id]: string[]) => fetch(url + "?chatId=" + id).then((r) => r.json())
-  );
-
-  return upvote ? (
-    <div className="flex flex-row gap-2 justify-end">
-      <button
-        className="p-4"
-        onClick={trackOnClick("UpvoteChat", { chatId }, () => {
-          addLike({ chatId, upvote: 1 }, () => invalidate());
-        })}
-      >
-        👍 {upvote?.positive}
-      </button>
-      <button
-        className="p-4"
-        onClick={trackOnClick("DownvoteChat", { chatId }, () => {
-          addLike({ chatId, upvote: -1 }, () => invalidate());
-        })}
-      >
-        👎 {upvote?.negative}
-      </button>
-    </div>
-  ) : null;
-};
-
-const ResultItem = ({ item, index }: { item: Result; index: number }) => {
-  const { data: upvote, mutate: invalidate } = useSWR<{ negative: 0; positive: 0 }>(
-    ["/api/like", item.id, index],
-    ([url, id, index]: string[]) => fetch(url + "?resultId=" + id + "&resultIndex=" + index).then((r) => r.json())
-  );
-
-  return (
-    <div key={item.href} className="flex flex-col gap-2">
-      <hr className="mb-4" />
-      <h3 className="SectionSubTitle mb-4">
-        [{index + 1}] 🌐 {new URL(item.href).hostname.replace("www.", "").replace(/blog\./, "")}: {item.title}
-      </h3>
-      <div className="mb-4">{item.body}</div>
-      <div className="flex flex-row justify-between gap-4">
-        <a
-          className="button p-4"
-          href={item.href}
-          onClick={trackLink("ResultGo", { domain: new URL(item.href).hostname })}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Go →
-        </a>
-
-        {item.id && item.id !== "0" && upvote ? (
-          <div className="flex flex-row justify-end gap-2">
-            <button
-              className="p-4"
-              onClick={trackOnClick("Upvote", { domain: new URL(item.href).hostname }, () => {
-                addLike({ resultId: item.id, resultIndex: index, upvote: 1 }, () => invalidate());
-              })}
-            >
-              👍 {upvote?.positive}
-            </button>
-            <button
-              className="p-4"
-              onClick={trackOnClick("Downvote", { domain: new URL(item.href).hostname }, () => {
-                addLike({ resultId: item.id, resultIndex: index, upvote: -1 }, () => invalidate());
-              })}
-            >
-              👎 {upvote?.negative}
-            </button>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-};
+import { formatMarkdown } from "../components/formatMarkdown";
+import { industries, countries } from "../components/data";
+import { removeEmoji, sortByStringWithEmojiRemoved } from "../components/emoji";
+import { UpvoteChat } from "../components/UpvoteChat";
+import { ResultItem } from "../components/ResultItem";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 
 export default function Home() {
   const router = useRouter();
@@ -236,10 +39,6 @@ export default function Home() {
     }
   );
 
-  const { data: limit } = useSWR("/api/tokens", (url: string) => fetch(url).then((r) => r.json()), {
-    refreshInterval: 10000,
-  });
-
   return (
     <>
       <Head>
@@ -250,45 +49,8 @@ export default function Home() {
         <script async defer data-domain="jojogpt.valosan.com" src="https://t.valosan.com/js/collect.js"></script>
       </Head>
 
-      <header>
-        <div className="mt-4 mb-4 md:mt-12 md:mb-12 flex flex-col md:flex-row gap-2 md:justify-between items-center">
-          <div className="flex flex-row items-center gap-3 md:gap-8">
-            <Link href="/">
-              <span className="Menu">🪀 JojoGPT</span>
-            </Link>
-          </div>
+      <Header />
 
-          <div className="flex flex-col md:flex-row items-center md:gap-8 gap-4">
-            <a
-              href="https://www.producthunt.com/posts/jojogpt?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-jojogpt"
-              target="_blank"
-            >
-              <img
-                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=382092&theme=light"
-                alt="JojoGPT - Find the right journalist with an AI | Product Hunt"
-                height="40"
-                className="object-contain max-h-[40px]"
-              />
-            </a>
-
-            <a
-              href="https://news.ycombinator.com/item?id=34996803"
-              className="flex flex-row justify-center gap-2 font-bold"
-            >
-              <img
-                src="/y.webp"
-                alt="Post on YCombinator News"
-                height={24}
-                className="rounded bg-[#ffffff] object-contain max-h-[24px]"
-              />
-              Hacker News
-            </a>
-            <a href="https://valosan.com?utm_source=jojogpt" target="_blank" rel="noopener noreferrer">
-              Brought to you by Valosan PR Platform
-            </a>
-          </div>
-        </div>
-      </header>
       <main className="main">
         {parseInt(retry, 10) >= 2 ? (
           <div className="center">
@@ -398,9 +160,7 @@ export default function Home() {
                   ))}
                 </select>
               </>
-            ) : (
-              <h2 className="Desc my-4">Select 👆</h2>
-            )}
+            ) : null}
 
             {value && country ? (
               <>
@@ -419,11 +179,9 @@ export default function Home() {
                     }
                   )}
                 >
-                  Find 🚀
+                  Find <span className={isLoading ? "fly text-lg" : "text-lg"}>🚀</span>
                 </button>
               </>
-            ) : value ? (
-              <h2 className="Desc my-4">Select 👆</h2>
             ) : null}
           </div>
         )}
@@ -474,18 +232,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        <div className="Desc text-center my-4">
-          2020-2023 &copy; Valosan Oy. All rights reserved. Jojo GPT is powered by ChatGPT by OpenAI and Valosan PR
-          Platform.
-        </div>
-
-        <div className="Desc text-center my-4">
-          Do you find JojoGPT useful? Please consider{" "}
-          <a href="https://www.buymeacoffee.com/huksley?utm_source=jojogpt">buying me a ☕ coffee</a>.
-        </div>
-
-        <div className="Desc text-center my-4">Tokens used: {limit?.current}</div>
+        <Footer />
       </main>
     </>
   );
