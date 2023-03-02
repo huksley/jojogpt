@@ -8,6 +8,7 @@ import { Data, Result } from "./api/query";
 import { useQueryState } from "next-usequerystate";
 import { trackLink, trackOnClick, track } from "../components/trackLink";
 import { compiler, MarkdownToJSX } from "markdown-to-jsx";
+import Link from "next/link";
 
 const DivElement = ({ children, ...props }: { children: React.ReactNode; props: unknown }) =>
   React.createElement("div", { ...props, className: "markdown" }, children);
@@ -251,9 +252,9 @@ export default function Home() {
       <header>
         <div className="mt-4 mb-4 md:mt-12 md:mb-12 flex flex-col md:flex-row gap-2 md:justify-between items-center">
           <div className="flex flex-row items-center gap-3 md:gap-8">
-            <a href="?">
+            <Link href="/">
               <span className="Menu">🪀 JojoGPT</span>
-            </a>
+            </Link>
           </div>
 
           <div className="flex flex-row items-center gap-8">
@@ -325,13 +326,13 @@ export default function Home() {
             </div>
 
             <div className="Desc mb-4">
-              Did you know that Series-A and C startups getting press coverage get 3x-5x more funding than those without
-              talking to the press?
+              Did you know that Series A to C startups getting press coverage raise 3-5x more funding than those without
+              talking to the press? It all starts with finding the right journalist to cover your story.
             </div>
 
-            <div className="SectionTitle">Search below to find journalists 👇</div>
+            <div className="SectionTitle">Search to find journalists 👇</div>
 
-            <h2 className="Desc my-4">I am creating a new product in the field</h2>
+            <h2 className="Desc my-4">I am creating a new product in the field of</h2>
 
             <select
               className="p-5"

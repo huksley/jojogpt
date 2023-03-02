@@ -33,7 +33,7 @@ const bad = {
     {
       id: "0",
       title: "None found :-/",
-      body: "Well, we tried. But we couldnt find any journalists",
+      body: "Well, we tried. But we couldn't find any journalists",
       href: "https://valosan.com?utm_source=jojogpt&utm_medium=referral&utm_campaign=none_found",
     },
   ],
