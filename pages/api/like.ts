@@ -1,76 +1,21 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import consoleStamp from "console-stamp";
-import { getCache } from "@/components/cache";
-import { createMiddlewares, runLimiterMiddleware } from "./query";
+import { createMiddlewares, runLimiterMiddleware } from "../../components/rateLimiting";
 import { getCookie, setCookie } from "cookies-next";
-import { hash } from "@/components/test";
-
+import { hash } from "@/components/gpt";
+import { addLikeChat, addLikeResult, getLikesChat, getLikesResult } from "@/components/like/pg";
 consoleStamp(console);
-
-const getLikeChat = async (chatId: string) => {
-  const cache = await getCache();
-  const key = `like:${chatId}`;
-  const value = await cache.get<Resp>(key);
-  return value || { positive: 0, negative: 0 };
-};
-
-const getLikeResult = async (sessionId: string, resultId: string, resultIndex: number): Promise<Resp> => {
-  const cache = await getCache();
-  const key = `like:${resultId}:${resultIndex}`;
-  const value = await cache.get<Resp>(key);
-  return value || { positive: 0, negative: 0 };
-};
-
-const addLikeChat = async (sessionId: string, chatId: string, upvote: number) => {
-  const cache = await getCache();
-  const key = `like:${chatId}`;
-  const value = await cache.get<Resp>(key);
-  const voted = await cache.get<number>(`voted:${sessionId}:${chatId}`);
-  if (!voted) {
-    if (value) {
-      await cache.set(key, {
-        positive: upvote > 0 ? value.positive + Math.sign(upvote) : value.positive,
-        negative: upvote < 0 ? value.negative - Math.sign(upvote) : value.negative,
-      });
-      await cache.set(`voted:${sessionId}:${chatId}`, 1);
-    } else {
-      await cache.set(key, { positive: upvote > 0 ? upvote : 0, negative: upvote < 0 ? -upvote : 0 });
-    }
-  } else {
-    console.info("Already voted", key);
-  }
-};
-
-interface Resp {
-  negative: number;
-  positive: number;
-}
-
-const addLikeResult = async (sessionId: string, resultId: string, resultIndex: number, upvote: number) => {
-  const cache = await getCache();
-  const key = `like:${resultId}:${resultIndex}`;
-  const value = await cache.get<{ positive: number; negative: number }>(key);
-  const voted = await cache.get<number>(`voted:${sessionId}:${resultId}:${resultIndex}`);
-  if (!voted) {
-    if (value) {
-      await cache.set(key, {
-        positive: upvote > 0 ? value.positive + Math.sign(upvote) : value.positive,
-        negative: upvote < 0 ? value.negative - Math.sign(upvote) : value.negative,
-      });
-      await cache.set(`voted:${sessionId}:${resultId}:${resultIndex}`, 1);
-    } else {
-      await cache.set(key, { positive: upvote > 0 ? upvote : 0, negative: upvote < 0 ? -upvote : 0 });
-    }
-  } else {
-    console.info("Already voted", key);
-  }
-};
 
 const middlewaresGet = createMiddlewares({ limit: 100, delayAfter: 100, prefix: "like-get-" });
 const middlewaresPost = createMiddlewares({ limit: 20, delayAfter: 20, prefix: "like-set-" });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<Resp | { message?: string }>) {
+interface Data {
+  negative: number;
+  positive: number;
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Data | { message?: string }>) {
   try {
     if (req.method === "GET") {
       await runLimiterMiddleware(middlewaresGet, req, res);
@@ -91,19 +36,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   try {
     if (req.method === "GET") {
       if (req.query.resultId && req.query.resultIndex) {
+        console.info("Get result likes", req.query.resultId, req.query.resultIndex);
         return res
           .status(200)
-          .json(
-            await getLikeResult(sessionId, req.query.resultId as string, parseInt(req.query.resultIndex as string, 10))
-          );
+          .json(await getLikesResult(req.query.resultId as string, parseInt(req.query.resultIndex as string, 10)));
       } else if (req.query.chatId) {
-        return res.status(200).json(await getLikeChat(req.query.chatId as string));
+        console.info("Get chat likes", req.query.chatId);
+        return res.status(200).json(await getLikesChat(req.query.chatId as string));
       } else {
         return res.status(400).json({ message: "Invalid" });
       }
     } else if (req.method === "POST") {
       if (req.body.resultId !== undefined && req.body.resultIndex !== undefined && req.body.upvote !== undefined) {
-        console.info("Upvote", req.body.resultId, req.body.resultIndex, req.body.upvote);
+        console.info("Upvote result", req.body.resultId, req.body.resultIndex, req.body.upvote);
         await addLikeResult(
           sessionId,
           req.body.resultId,
@@ -112,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         );
         return res.status(200).json({ message: "OK" });
       } else if (req.body.chatId !== undefined && req.body.upvote !== undefined) {
-        console.info("Upvote", req.body.chatId, req.body.upvote);
+        console.info("Upvote chat", req.body.chatId, req.body.upvote);
         await addLikeChat(sessionId, req.body.chatId, parseInt(req.body.upvote, 10));
         return res.status(200).json({ message: "OK" });
       } else {

@@ -1,7 +1,7 @@
 import useSWR from "swr";
-import { Result } from "../pages/api/query";
-import { trackLink, trackOnClick } from "./trackLink";
-import { addLike } from "./addLike";
+import { Result } from "../../pages/api/query";
+import { trackLink, trackOnClick } from "./track";
+import { addLike } from "../like/addLike";
 
 export const ResultItem = ({ item, index }: { item: Result; index: number }) => {
   const { data: upvote, mutate: invalidate } = useSWR<{ negative: 0; positive: 0 }>(

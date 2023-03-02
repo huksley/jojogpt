@@ -1,6 +1,6 @@
 import useSWR from "swr";
-import { trackOnClick } from "./trackLink";
-import { addLike } from "./addLike";
+import { trackOnClick } from "./track";
+import { addLike } from "../like/addLike";
 
 export const UpvoteChat = ({ chatId }: { chatId?: string }) => {
   const { data: upvote, mutate: invalidate } = useSWR<{ negative: 0; positive: 0 }>(

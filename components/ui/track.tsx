@@ -35,22 +35,21 @@ type PlausibleTracker = (
   props?: { callback?: () => void; [key: string]: string | number | unknown }
 ) => void;
 
+/** Track onClick events */
 export const trackOnClick =
   (goal: Goal, props?: Record<string, unknown>, onClick?: (event: UserEvent) => void) => (event: UserEvent) =>
     track(event, goal, props).then((_) => onClick && onClick(event));
-/** Track link events for hrefs <a href="/link" onClick={trackLink(goal, props)}>Hello</a> */
 
+/** Track link events for hrefs <a href="/link" onClick={trackLink(goal, props)}>Hello</a> */
 export const trackLink =
   (goal: Goal, props?: Record<string, unknown>) => (event: React.MouseEvent<HTMLAnchorElement, Event>) =>
     track(event, goal, props);
+
 /**
  * Logs frontend event to analytics, if enabled, as `goal(goal, props?)`
  *
- * If intercom available and booted, logs event to the intercom, otherwise to Plausible.
  * - https://docs.plausible.io/custom-event-goals/
- * - https://www.intercom.com/help/en/articles/175-set-up-event-tracking-in-intercom
  */
-
 export const track = (event: UserEvent | undefined, goal: Goal, props?: Record<string, unknown>): Promise<boolean> => {
   // FIXME: arguments are different from one at https://github.com/plausible/plausible-tracker
   const tracker = (global as any).plausible as PlausibleTracker | undefined;

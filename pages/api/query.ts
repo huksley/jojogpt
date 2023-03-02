@@ -1,14 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import rateLimit from "express-rate-limit";
-import slowDown from "express-slow-down";
-import RedisStore from "rate-limit-redis";
-import { createClient } from "redis";
 import consoleStamp from "console-stamp";
-import { hash, queryChatGpt } from "../../components/test";
+import { hash, queryChatGpt } from "@/components/gpt";
 import { getCache } from "@/components/cache";
-import { removeEmoji } from "@/components/emoji";
-import { saveChat, saveResults } from "../../components/like_pg";
+import { removeEmoji } from "@/components/ui/emoji";
+import { saveChat, saveResults } from "@/components/like/pg";
+import { retry } from "@/components/retry";
+import { createMiddlewares, runLimiterMiddleware } from "@/components/rateLimiting";
+import { fetchWithTimeout } from "./fetchWithTimeout";
 consoleStamp(console);
 
 export interface Result {
@@ -39,100 +38,7 @@ const bad = {
   ],
 };
 
-/** Retry execution of specified function */
-export const retry = async <T>(fn: () => Promise<T>, attempts = 3, interval = 1000, name?: string): Promise<T> => {
-  try {
-    return await fn();
-  } catch (error) {
-    console.info("Retrying", name ?? "func", "ignoring error", error, "attempts left", attempts);
-    if (attempts > 0) {
-      return new Promise((resolve, reject) =>
-        setTimeout(
-          () =>
-            retry(fn, attempts - 1, interval)
-              .then(resolve)
-              .catch(reject),
-          interval
-        )
-      );
-    }
-
-    throw error;
-  }
-};
-
-const client = createClient({
-  // ... (see https://github.com/redis/node-redis/blob/master/docs/client-configuration.md)
-});
-client.connect();
-
-const applyMiddleware = (middleware: any) => (request: any, response: any) =>
-  new Promise((resolve, reject) => {
-    middleware(request, response, (result: any) => (result instanceof Error ? reject(result) : resolve(result)));
-  });
-
-export const getIP = (request: any) =>
-  request.ip || request.headers["x-forwarded-for"] || request.headers["x-real-ip"] || request.connection.remoteAddress;
-
-export const getRateLimitMiddlewares = ({
-  limit = 10,
-  windowMs = 60 * 1000,
-  delayAfter = 10,
-  delayMs = 500,
-  store,
-  prefix,
-}: {
-  limit?: number;
-  windowMs?: number;
-  delayAfter?: number;
-  delayMs?: number;
-  store: any;
-  prefix?: string;
-}) => [
-  slowDown({
-    keyGenerator: prefix ? (request: any) => prefix + getIP(request) : getIP,
-    windowMs,
-    delayAfter,
-    delayMs,
-    // fixme: redis
-    onLimitReached: (req) => console.log("onLimitReached slowDown", getIP(req)),
-  }),
-  rateLimit({
-    keyGenerator: getIP,
-    windowMs,
-    max: limit,
-    store,
-    onLimitReached: (req) => console.log("onLimitReached rateLimit", getIP(req)),
-  }),
-];
-
-export const createMiddlewares = (opts: any) =>
-  getRateLimitMiddlewares({
-    ...opts,
-    store: new RedisStore({
-      sendCommand: (...args: string[]) => client.sendCommand(args),
-    }),
-  }).map(applyMiddleware);
-
 const middlewares = createMiddlewares({ limit: 10, delayAfter: 5, prefix: "query-" });
-
-// https://dmitripavlutin.com/timeout-fetch-request/
-export const fetchWithTimeout = async (url: RequestInfo, init?: RequestInit & { timeout?: number }) => {
-  const timeout = init?.timeout || 30000;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort("Request timeout " + timeout + " ms"), timeout);
-  const response: Response | undefined = await fetch(url, {
-    ...init,
-    // FIXME: signal definitions are incompatible
-    signal: controller.signal,
-  } as RequestInit);
-
-  if (timeoutId) {
-    clearTimeout(timeoutId);
-  }
-
-  return response;
-};
 
 export default async function handler2(req: NextApiRequest, res: NextApiResponse<Data | Error>) {
   try {
@@ -260,14 +166,4 @@ export default async function handler2(req: NextApiRequest, res: NextApiResponse
   } else {
     return res.status(200).json(bad);
   }
-}
-
-type MiddlewareFunc = (req: NextApiRequest, res: NextApiResponse) => Promise<unknown>;
-
-export function runLimiterMiddleware(
-  middlewares: MiddlewareFunc[],
-  req: NextApiRequest,
-  res: NextApiResponse<Data | Error>
-) {
-  return Promise.all(middlewares.map((middleware) => middleware(req, res)));
 }
