@@ -78,7 +78,7 @@ export default async function handler2(req: NextApiRequest, res: NextApiResponse
 
     const key = hash(query);
     try {
-      console.info("DDG query", query, "key", key, "search url", process.env.SEARCH_URL);
+      console.info("Search query", query, "key", key, "search url", process.env.SEARCH_URL);
       const json = process.env.SEARCH_URL
         ? await getCache().getset(
             "ddg-" + key,
