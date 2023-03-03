@@ -38,6 +38,95 @@ const bad = {
   ],
 };
 
+function generatePrompt(json: Result[], query: string, maxResults?: number) {
+  return `Web search results:
+
+      ${json
+        .filter((_, index) => !maxResults || index < maxResults)
+        .map(
+          (c, index) => `[${index + 1}] "${c.title}"
+URL: ${c.href}
+`
+        )
+        .join("\n")}
+          
+Instructions: Using the provided web search results, write a comprehensive reply to the given query. Make sure to cite results using [[number](URL)] notation after the reference. If the provided search results refer to multiple subjects with the same name, write separate answers for each subject. If the provided search results do not contain enough information to answer the query, write an answer based on your own knowledge in the same format.
+Query: ${query}`;
+}
+
+const querySearch = async (
+  query: string,
+  searchParams: URLSearchParams,
+  industry: string,
+  country: string
+): Promise<Result[]> => {
+  searchParams.set("q", query);
+  const key = hash(query);
+  console.info("Search query", query, "key", key, "search url", process.env.SEARCH_URL);
+  if (!process.env.SEARCH_URL) {
+    throw new Error("No search url");
+  }
+
+  const json = await getCache().getset(
+    "ddg-v2-" + key,
+    async () => {
+      const headers = new Headers({
+        Origin: "https://chat.openai.com",
+        "Content-Type": "application/json",
+        Accept: "*/*",
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
+      });
+
+      const url = process.env.SEARCH_URL + `?${searchParams.toString()}`;
+      console.info("Invoke", url);
+      const response = await retry(() =>
+        fetchWithTimeout(url, {
+          method: "GET",
+          headers,
+          timeout: 30000,
+        }).then(async (response) => {
+          return {
+            headers: response.headers,
+            status: response.status,
+            statusText: response.statusText,
+            json: await response.json(),
+          };
+        })
+      );
+
+      console.info("Search", url, "response", response);
+      const results = response.json;
+      const json = (results as Result[]).map((result: any) => {
+        return {
+          id: "0",
+          body: result.body,
+          href: result.href,
+          title: result.title,
+        };
+      });
+
+      const id = await saveResults(industry, country, json);
+      console.info("Search", url, "saved results", id);
+      if (id) {
+        json.forEach((item) => {
+          item.id = id;
+        });
+      }
+      console.info("Search", url, "results", json.length);
+
+      return json;
+    },
+    1000 * 3600 * 24 * 1
+  );
+
+  if (!json) {
+    throw new Error("No results");
+  }
+
+  return json;
+};
+
 const middlewares = createMiddlewares({ limit: 10, delayAfter: 5, prefix: "query-" });
 
 export default async function handler2(req: NextApiRequest, res: NextApiResponse<Data | Error>) {
@@ -71,94 +160,24 @@ export default async function handler2(req: NextApiRequest, res: NextApiResponse
 
     const query = "Who is the best journalist in " + country + " who writes about " + value + "?";
     const searchParams = new URLSearchParams();
-    searchParams.set("q", query);
-    searchParams.set("max_results", String(numResults ?? 3));
+    searchParams.set("max_results", String(numResults ?? 5));
     if (timePeriod) searchParams.set("time", timePeriod);
     if (region) searchParams.set("region", region);
 
-    const key = hash(query);
     try {
-      console.info("Search query", query, "key", key, "search url", process.env.SEARCH_URL);
-      const json = process.env.SEARCH_URL
-        ? await getCache().getset(
-            "ddg-" + key,
-            async () => {
-              const headers = new Headers({
-                Origin: "https://chat.openai.com",
-                "Content-Type": "application/json",
-                Accept: "*/*",
-                "User-Agent":
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
-              });
+      const json = await querySearch(query, searchParams, value, country);
+      const prompt = json ? generatePrompt(json, query, 3) : undefined;
+      const response = json && prompt ? await queryChatGpt(prompt) : undefined;
 
-              const url = process.env.SEARCH_URL + `?${searchParams.toString()}`;
-              console.info("Invoke", url);
-              const response = await retry(() =>
-                fetchWithTimeout(url, {
-                  method: "GET",
-                  headers,
-                  timeout: 30000,
-                }).then(async (response) => {
-                  return {
-                    headers: response.headers,
-                    status: response.status,
-                    statusText: response.statusText,
-                    json: await response.json(),
-                  };
-                })
-              );
-
-              console.info("Response", response);
-              const results = response.json;
-              const json = (results as Result[]).map((result: any) => {
-                return {
-                  id: "0",
-                  body: result.body,
-                  href: result.href,
-                  title: result.title,
-                };
-              });
-              const id = await saveResults(value!, country!, json);
-              console.info("Save results", id);
-              if (id) {
-                json.forEach((item) => {
-                  item.id = id;
-                });
-              }
-              console.info("Query", req.body, "results", json);
-              return json;
-            },
-            1000 * 3600 * 24 * 1
-          )
-        : undefined;
-
-      if (!json) {
-        return res.status(200).json(bad);
+      let chatId: string | undefined = undefined;
+      if (prompt && json && json[0] && json[0].id) {
+        console.info("ChatGPT response", response);
+        if (response) {
+          chatId = await saveChat(value!, country!, json[0].id, prompt, response);
+        }
       }
 
-      const prompt = json
-        ? `Web search results:
-
-      ${json
-        .map(
-          (c, index) => `[${index + 1}] "${c.title}"
-          URL: ${c.href}
-        `
-        )
-        .join("\n")}
-          
-          Instructions: Using the provided web search results, write a comprehensive reply to the given query. Make sure to cite results using [[number](URL)] notation after the reference. If the provided search results refer to multiple subjects with the same name, write separate answers for each subject. If the provided search results do not contain enough information to answer the query, write an answer based on your own knowledge in the same format.
-          Query: What is the best journalist to write about startups in ${value} in ${country}?`
-        : undefined;
-      const chat = json && prompt ? await queryChatGpt(query) : undefined;
-
-      console.info("ChatGPT response", chat?.data?.choices[0]?.message?.content);
-      const chatId =
-        json && query
-          ? await saveChat(value!, country!, json[0].id, prompt ?? "", chat?.data?.choices[0]?.message?.content ?? "")
-          : undefined;
-
-      return res.status(200).json({ links: json, chatId, message: chat?.data?.choices[0]?.message?.content });
+      return res.status(200).json({ links: json, chatId, message: response });
     } catch (e) {
       console.error("Query error", e);
       return res.status(200).json(bad);

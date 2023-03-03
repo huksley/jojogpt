@@ -18,7 +18,7 @@ export const hash = (value: string, algo?: string) => {
 
 export const queryChatGpt = async (query: string) => {
   if (!process.env.OPENAI_API_KEY) {
-    return null;
+    return undefined;
   }
 
   const configuration = new Configuration({
@@ -52,7 +52,6 @@ export const queryChatGpt = async (query: string) => {
         ],
       });
 
-      console.info("Response", response.status, response.statusText);
       if (response.data) {
         const add = response.data.usage?.total_tokens;
         const result = await tokens(add);
@@ -76,7 +75,12 @@ export const queryChatGpt = async (query: string) => {
     1000 * 3600 * 24 * 30
   );
 
-  return response;
+  const text = response?.data?.choices[0]?.message?.content;
+  if (text) {
+    return text;
+  } else {
+    throw new Error("No response text");
+  }
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -91,20 +95,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const response = await queryChatGpt(query);
     if (response) {
-      return res.status(200).json({ data: response.data });
+      return res.status(200).json({ data: response });
     } else {
       console.info("ChatGPT failed, no response");
       return res.status(500).json({ message: "Internal Server Error" });
     }
   } catch (err: any) {
-    console.warn(
-      "Error",
-      err?.message,
-      "response",
-      err?.response?.status,
-      err?.response?.statusText,
-      err?.response?.data
-    );
+    console.warn("Error", err?.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }

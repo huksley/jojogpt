@@ -8,7 +8,7 @@ export const Footer = () => {
   return (
     <>
       <div className="text-center my-4">
-        2020-2023 &copy; Valosan Oy. Jojo GPT is powered by ChatGPT and Valosan PR Platform | Tokens used:{" "}
+        2020-2023 &copy; Valosan Oy. JojoGPT is powered by ChatGPT and Valosan PR Platform | Tokens used:{" "}
         {limit?.current}
       </div>
     </>
