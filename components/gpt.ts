@@ -33,7 +33,7 @@ export const queryChatGpt = async (query: string) => {
     },
   ] as ChatCompletionRequestMessage[];
 
-  const key = "openai-" + hash(JSON.stringify(messages));
+  const key = "openai-v2-" + hash(JSON.stringify(messages));
   console.info("ChatGPT query key", key, "messages", messages);
   const response = await getCache().getset(
     key,
