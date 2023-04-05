@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import consoleStamp from "console-stamp";
 import { createMiddlewares, runLimiterMiddleware } from "../../components/rateLimiting";
 import { getCookie, setCookie } from "cookies-next";
-import { hash } from "@/components/gpt";
+import { hash } from "@/components/hash";
 import { addLikeChat, addLikeResult, getLikesChat, getLikesResult } from "@/components/like/pg";
 consoleStamp(console);
 

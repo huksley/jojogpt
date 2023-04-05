@@ -1,12 +1,12 @@
 import consoleStamp from "console-stamp";
 import { timestampDay } from "../limit";
 import { createClient } from "@supabase/supabase-js";
-import { Result } from "../../pages/api/query";
+import { Result } from "@/components/querySearch";
 
 consoleStamp(console);
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : undefined;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : undefined;
 
 export const saveResults = async (industry: string, country: string, list: Result[]) => {
   if (!supabase) {

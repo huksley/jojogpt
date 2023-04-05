@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const response = await queryChatGpt(query);
     if (response) {
-      return res.status(200).json({ data: response.data });
+      return res.status(200).json({ data: response });
     } else {
       console.info("ChatGPT failed, no response");
       return res.status(500).json({ message: "Internal Server Error" });

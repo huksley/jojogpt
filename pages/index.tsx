@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/Form";
 import { useEffect, useState } from "react";
 import { Display } from "@/components/ui/Display";
 import useSWR from "swr";
-import { Data } from "./api/query";
+import { Data } from "../components/querySearch";
 
 export default function Home() {
   const router = useRouter();

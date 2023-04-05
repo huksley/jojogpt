@@ -200,7 +200,7 @@ export const Limit = {
       throw new Error("No Redis cache");
     }
 
-    return (increment = 1) => limitValue(redis, prefix, increment, max, 3600 * 24, timestampMonth);
+    return (increment = 1) => limitValue(redis, prefix, increment, max, 3600 * 24 * 31, timestampMonth);
   },
 
   day(prefix: string, max: number) {

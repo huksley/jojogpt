@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { Result } from "../../pages/api/query";
+import { Result } from "@/components/querySearch";
 import { trackLink, trackOnClick } from "./track";
 import { addLike } from "../like/addLike";
 

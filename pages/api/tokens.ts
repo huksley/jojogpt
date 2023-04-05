@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import consoleStamp from "console-stamp";
-import { tokens } from "@/components/gpt";
+import { tokens } from "@/components/tokens";
 consoleStamp(console);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

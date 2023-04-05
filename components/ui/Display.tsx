@@ -4,7 +4,7 @@ import { removeEmoji } from "./emoji";
 import { UpvoteChat } from "./UpvoteChat";
 import { ResultItem } from "./ResultItem";
 import { useRouter } from "next/router";
-import { Data } from "@/pages/api/query";
+import { Data } from "@/components/querySearch";
 
 export const Display = ({ value, country, data }: { value: string; country: string; data: Data }) => {
   const router = useRouter();
