@@ -10,9 +10,10 @@ URL: ${c.href}
 `
   )
   .join("\n")}
-          
-Instructions: Using the provided web search results, write a detailed reply to the query.
-Make sure to cite results using [[number](URL)] notation after the reference.
-Use your best guess, and provide names of journalists with a link to the article.
+
+Instructions: Write summary of your knowledge based on provided search results and
+cite results using [[number](URL)] notation after the reference.
+If search results are not relevant, write based on your own knowledge. 
+Do not write "I am sorry", that you are AI model, do not know, etc. 
 Query: ${query}`;
 }
