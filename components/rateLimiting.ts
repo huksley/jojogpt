@@ -1,8 +1,8 @@
-import { client } from "@/components/redis";
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
 import { NextApiRequest, NextApiResponse } from "next";
 import RedisStore from "rate-limit-redis";
+import { getRedis } from "./cache";
 
 const applyMiddleware = (middleware: any) => (request: any, response: any) =>
   new Promise((resolve, reject) => {
@@ -44,14 +44,18 @@ export const getRateLimitMiddlewares = ({
   }),
 ];
 
-export const createMiddlewares = (opts: any) =>
-  getRateLimitMiddlewares({
-    ...opts,
-    store: new RedisStore({
-      prefix: opts.prefix,
-      sendCommand: (...args: string[]) => client.sendCommand(args),
-    }),
-  }).map(applyMiddleware);
+export const createMiddlewares = (opts: any) => {
+  const client = getRedis();
+  return client
+    ? getRateLimitMiddlewares({
+        ...opts,
+        store: new RedisStore({
+          prefix: opts.prefix,
+          sendCommand: (...args: string[]) => client.sendCommand(args),
+        }),
+      }).map(applyMiddleware)
+    : [];
+};
 
 type MiddlewareFunc = (req: NextApiRequest, res: NextApiResponse) => Promise<unknown>;
 

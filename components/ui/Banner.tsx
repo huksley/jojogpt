@@ -36,7 +36,7 @@ export const Banner = () => (
       </div>
 
       <div className="flex flex-col mt-4 md:flex-row gap-6 justify-between items-start">
-        <h2 className="Heading2 md:w-[40%]">Use our PR platform to do everything 10x faster.</h2>
+        <h2 className="Heading2 md:w-[40%]">Use our PR platform to do PR 10x faster.</h2>
         <div>
           <a href="https://valosan.com?utm_source=jojogpt" className="button px-8 py-4">
             Explore Valosan

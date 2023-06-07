@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     const query = generateQuery(value, country);
     const searchParams = new URLSearchParams();
-    searchParams.set("max_results", String(numResults ?? 5));
+    searchParams.set("max_results", String(numResults ?? (process.env.MAX_SEARCH_RESULTS || "3")));
     if (timePeriod) searchParams.set("time", timePeriod);
     if (region) searchParams.set("region", region);
 
